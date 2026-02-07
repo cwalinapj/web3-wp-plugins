@@ -1,0 +1,47 @@
+# WordPress
+wp-config.php
+wp-content/uploads/
+wp-content/blogs.dir/
+wp-content/upgrade/
+wp-content/backup-db/
+wp-content/cache/
+wp-content/advanced-cache.php
+wp-content/wp-cache-config.php
+
+# WP Engine
+.smushit-status
+.gitattributes
+
+# Logs
+*.log
+error_log
+debug.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Composer
+vendor/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build files
+dist/
+build/
