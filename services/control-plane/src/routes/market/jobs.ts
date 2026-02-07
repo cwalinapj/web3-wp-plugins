@@ -75,6 +75,12 @@ const JOB_STATE_MACHINE: Record<JobState, JobState[]> = {
 const jobs = new Map<string, Job>();
 
 const nowIso = (): string => new Date().toISOString();
+const buildVerificationGate = (visionDiffThreshold?: number): JobVerificationGate => ({
+  healthChecksPassed: false,
+  logScanPassed: false,
+  visionDiffRatio: 0,
+  visionDiffThreshold: visionDiffThreshold ?? DEFAULT_VISION_DIFF_THRESHOLD,
+});
 
 export const listJobs = (filter?: Partial<Pick<Job, 'state' | 'helperId' | 'requesterId'>>): Job[] => {
   const values = Array.from(jobs.values());
@@ -120,26 +126,10 @@ export const createJob = (input: CreateJobInput): Job => {
     state: 'open',
     sandboxOnly: true,
     requiresApproval: true,
-    verification: input.visionDiffThreshold
-      ? {
-          healthChecksPassed: false,
-          logScanPassed: false,
-          visionDiffRatio: 0,
-          visionDiffThreshold: input.visionDiffThreshold,
-        }
-      : undefined,
+    verification: buildVerificationGate(input.visionDiffThreshold),
     createdAt: timestamp,
     updatedAt: timestamp,
   };
-
-  if (!job.verification) {
-    job.verification = {
-      healthChecksPassed: false,
-      logScanPassed: false,
-      visionDiffRatio: 0,
-      visionDiffThreshold: input.visionDiffThreshold ?? DEFAULT_VISION_DIFF_THRESHOLD,
-    };
-  }
 
   jobs.set(job.id, job);
   return job;
@@ -156,12 +146,7 @@ export const updateJob = (jobId: string, updates: UpdateJobInput): Job => {
           visionDiffThreshold: updates.visionDiffThreshold ?? job.verification.visionDiffThreshold,
         }
       : updates.visionDiffThreshold
-        ? {
-            healthChecksPassed: false,
-            logScanPassed: false,
-            visionDiffRatio: 0,
-            visionDiffThreshold: updates.visionDiffThreshold,
-          }
+        ? buildVerificationGate(updates.visionDiffThreshold)
         : job.verification,
     updatedAt: nowIso(),
   };
