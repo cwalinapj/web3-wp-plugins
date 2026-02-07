@@ -72,7 +72,7 @@ export const listHelpers = (filter?: { minReputation?: number }): HelperProfile[
   if (!filter || filter.minReputation === undefined) {
     return values;
   }
-  return values.filter((helper) => helper.reputationScore >= filter.minReputation!);
+  return values.filter((helper) => helper.reputationScore >= filter.minReputation);
 };
 
 export const getHelper = (helperId: string): HelperProfile | undefined => helpers.get(helperId);
