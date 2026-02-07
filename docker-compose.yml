@@ -1,0 +1,32 @@
+version: "3.8"
+services:
+  db:
+    image: mariadb:10.11
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wp
+      MYSQL_PASSWORD: wp
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+  wordpress:
+    image: wordpress:6.5-php8.2-apache
+    depends_on:
+      - db
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wp
+      WORDPRESS_DB_PASSWORD: wp
+      WORDPRESS_DB_NAME: wordpress
+    ports:
+      - "8085:80"
+    volumes:
+      - ./ddns-optin:/var/www/html/wp-content/plugins/ddns-optin
+      - ./ddns-accelerator:/var/www/html/wp-content/plugins/ddns-accelerator
+      - ./ddns-compat-orchestrator:/var/www/html/wp-content/plugins/ddns-compat-orchestrator
+      - ./ddns-toll-comments:/var/www/html/wp-content/plugins/ddns-toll-comments
+      - ./ddns-ai-admin:/var/www/html/wp-content/plugins/ddns-ai-admin
+volumes:
+  db_data:

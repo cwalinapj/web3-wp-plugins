@@ -29,3 +29,27 @@ See the [Contributor Bounties README](contributor-bounties/README.md) for detail
 ## License
 
 GPL v2 or later
+
+# Web3 WP Plugins
+
+## Local WordPress
+```bash
+/Users/root1/dev/web3-repos/web3-wp-plugins/scripts/wp-up.sh
+```
+
+Stop:
+```bash
+/Users/root1/dev/web3-repos/web3-wp-plugins/scripts/wp-down.sh
+```
+
+## Package Plugins
+```bash
+/Users/root1/dev/web3-repos/web3-wp-plugins/scripts/package.sh
+```
+
+## Plugins
+- ddns-optin
+- ddns-accelerator
+- ddns-compat-orchestrator
+- ddns-toll-comments
+- ddns-ai-admin
