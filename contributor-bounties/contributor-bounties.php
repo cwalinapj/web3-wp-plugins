@@ -334,7 +334,21 @@ class Contributor_Bounties {
         global $wpdb;
         $table_name = $wpdb->prefix . 'cb_submissions';
         
-        $submissions = $wpdb->get_results("SELECT * FROM $table_name ORDER BY submitted_date DESC");
+        // Get current page for pagination
+        $paged = isset($_GET['paged']) ? absint($_GET['paged']) : 1;
+        $per_page = 20;
+        $offset = ($paged - 1) * $per_page;
+        
+        // Get total count
+        $total = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
+        $total_pages = ceil($total / $per_page);
+        
+        // Get paginated submissions
+        $submissions = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM $table_name ORDER BY submitted_date DESC LIMIT %d OFFSET %d",
+            $per_page,
+            $offset
+        ));
         
         ?>
         <div class="wrap">
@@ -369,6 +383,21 @@ class Contributor_Bounties {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                
+                <?php if ($total_pages > 1): ?>
+                <div class="tablenav">
+                    <div class="tablenav-pages">
+                        <?php
+                        echo paginate_links(array(
+                            'base' => add_query_arg('paged', '%#%'),
+                            'format' => '',
+                            'current' => $paged,
+                            'total' => $total_pages,
+                        ));
+                        ?>
+                    </div>
+                </div>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
         <?php
@@ -378,7 +407,7 @@ class Contributor_Bounties {
      * Render settings page
      */
     public function render_settings_page() {
-        if (isset($_POST['cb_save_settings']) && check_admin_referer('cb_settings_nonce')) {
+        if (isset($_POST['cb_save_settings']) && check_admin_referer('cb_settings_nonce', 'cb_settings_nonce')) {
             update_option('cb_github_integration', isset($_POST['cb_github_integration']));
             update_option('cb_github_webhook_secret', sanitize_text_field($_POST['cb_github_webhook_secret']));
             echo '<div class="notice notice-success"><p>' . __('Settings saved.', 'contributor-bounties') . '</p></div>';
@@ -392,7 +421,7 @@ class Contributor_Bounties {
             <h1><?php _e('Contributor Bounties Settings', 'contributor-bounties'); ?></h1>
             
             <form method="post" action="">
-                <?php wp_nonce_field('cb_settings_nonce'); ?>
+                <?php wp_nonce_field('cb_settings_nonce', 'cb_settings_nonce'); ?>
                 
                 <table class="form-table">
                     <tr>
@@ -492,7 +521,7 @@ class Contributor_Bounties {
                             <p><strong><?php _e('Payout:', 'contributor-bounties'); ?></strong> <?php echo esc_html($payout_amount); ?></p>
                         <?php endif; ?>
                         <?php if ($deadline): ?>
-                            <p><strong><?php _e('Deadline:', 'contributor-bounties'); ?></strong> <?php echo esc_html(date('F j, Y', strtotime($deadline))); ?></p>
+                            <p><strong><?php _e('Deadline:', 'contributor-bounties'); ?></strong> <?php echo esc_html(date_i18n('F j, Y', strtotime($deadline))); ?></p>
                         <?php endif; ?>
                         <?php if ($max_winners): ?>
                             <p><strong><?php _e('Max Winners:', 'contributor-bounties'); ?></strong> <?php echo esc_html($max_winners); ?></p>

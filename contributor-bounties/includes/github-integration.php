@@ -174,7 +174,7 @@ class CB_GitHub_Integration {
         
         // Create new user
         $username = 'github_' . sanitize_user($github_username);
-        $email = $github_username . '@github.contributor.local';
+        $email = $github_username . '@invalid.github.contributor';
         
         // Check if username already exists
         $counter = 1;
