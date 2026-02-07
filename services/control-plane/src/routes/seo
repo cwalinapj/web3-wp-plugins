@@ -1,8 +1,1 @@
-services/control-plane/src/routes/seo/
 
-	•	jobs.ts (state transitions, who can do what)
-	•	payout.ts (release/refund gating)
-	•	tracking.ts (reads SERP attestation)
-	•	policy.ts (the deterministic success scoring + windows)
-
-Add a single function that decides payout:
