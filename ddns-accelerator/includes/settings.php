@@ -76,6 +76,96 @@ function ddns_accelerator_register_settings(): void
             'default' => '',
         )
     );
+    register_setting(
+        'ddns_accelerator',
+        'ddns_accelerator_cf_global_token',
+        array(
+            'type' => 'string',
+            'sanitize_callback' => 'sanitize_text_field',
+            'default' => '',
+        )
+    );
+    register_setting(
+        'ddns_accelerator',
+        'ddns_accelerator_openai_api_key',
+        array(
+            'type' => 'string',
+            'sanitize_callback' => 'sanitize_text_field',
+            'default' => '',
+        )
+    );
+    register_setting(
+        'ddns_accelerator',
+        'ddns_accelerator_vps_provider',
+        array(
+            'type' => 'string',
+            'sanitize_callback' => 'sanitize_text_field',
+            'default' => '',
+        )
+    );
+    register_setting(
+        'ddns_accelerator',
+        'ddns_accelerator_vps_aws_access_key_id',
+        array(
+            'type' => 'string',
+            'sanitize_callback' => 'sanitize_text_field',
+            'default' => '',
+        )
+    );
+    register_setting(
+        'ddns_accelerator',
+        'ddns_accelerator_vps_aws_secret_access_key',
+        array(
+            'type' => 'string',
+            'sanitize_callback' => 'sanitize_text_field',
+            'default' => '',
+        )
+    );
+    register_setting(
+        'ddns_accelerator',
+        'ddns_accelerator_vps_aws_region',
+        array(
+            'type' => 'string',
+            'sanitize_callback' => 'sanitize_text_field',
+            'default' => '',
+        )
+    );
+    register_setting(
+        'ddns_accelerator',
+        'ddns_accelerator_vps_do_token',
+        array(
+            'type' => 'string',
+            'sanitize_callback' => 'sanitize_text_field',
+            'default' => '',
+        )
+    );
+    register_setting(
+        'ddns_accelerator',
+        'ddns_accelerator_vps_hetzner_token',
+        array(
+            'type' => 'string',
+            'sanitize_callback' => 'sanitize_text_field',
+            'default' => '',
+        )
+    );
+    register_setting(
+        'ddns_accelerator',
+        'ddns_accelerator_vps_vultr_token',
+        array(
+            'type' => 'string',
+            'sanitize_callback' => 'sanitize_text_field',
+            'default' => '',
+        )
+    );
+    register_setting(
+        'ddns_accelerator',
+        'ddns_accelerator_vps_other',
+        array(
+            'type' => 'string',
+            'sanitize_callback' => 'sanitize_textarea_field',
+            'default' => '',
+        )
+    );
 
     register_setting(
         'ddns_accelerator',

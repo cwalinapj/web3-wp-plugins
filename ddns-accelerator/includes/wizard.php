@@ -48,6 +48,9 @@ function ddns_accelerator_render_wizard_page(): void
     ?>
     <div class="wrap ddns-accelerator">
         <h1>DDNS Accelerator Wizard</h1>
+        <div class="notice notice-info inline">
+            <p>Users will need the Origin Wallet app to complete Web3 actions.</p>
+        </div>
         <p class="description">
             Move as much as possible to the edge: caching, routing, security,
             asset optimization, backup triggers, and automation.
@@ -144,6 +147,138 @@ function ddns_accelerator_render_wizard_page(): void
                                 and Account → Cloudflare Pages → Edit (scope to
                                 this domain + account). You can revoke anytime.
                             </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="ddns-accelerator-cf-global">Cloudflare global token</label></th>
+                        <td>
+                            <input
+                                class="regular-text ddns-accelerator-secret"
+                                id="ddns-accelerator-cf-global"
+                                type="password"
+                                name="ddns_accelerator_cf_global_token"
+                                value="<?php echo esc_attr(get_option('ddns_accelerator_cf_global_token', '')); ?>"
+                                placeholder="Global API Key"
+                            />
+                            <p class="description">Optional fallback for global Cloudflare APIs.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="ddns-accelerator-openai-key">OpenAI API key</label></th>
+                        <td>
+                            <input
+                                class="regular-text ddns-accelerator-secret"
+                                id="ddns-accelerator-openai-key"
+                                type="password"
+                                name="ddns_accelerator_openai_api_key"
+                                value="<?php echo esc_attr(get_option('ddns_accelerator_openai_api_key', '')); ?>"
+                                placeholder="sk-..."
+                            />
+                            <p class="description">Optional for AI-assisted optimizations.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="ddns-accelerator-vps-provider">VPS provider</label></th>
+                        <td>
+                            <?php $provider = get_option('ddns_accelerator_vps_provider', ''); ?>
+                            <select id="ddns-accelerator-vps-provider" name="ddns_accelerator_vps_provider">
+                                <option value="" <?php selected($provider, ''); ?>>Select provider</option>
+                                <option value="aws" <?php selected($provider, 'aws'); ?>>AWS EC2</option>
+                                <option value="digitalocean" <?php selected($provider, 'digitalocean'); ?>>DigitalOcean</option>
+                                <option value="hetzner" <?php selected($provider, 'hetzner'); ?>>Hetzner</option>
+                                <option value="vultr" <?php selected($provider, 'vultr'); ?>>Vultr</option>
+                                <option value="other" <?php selected($provider, 'other'); ?>>Other</option>
+                            </select>
+                            <p class="description">Choose which provider to use for sandbox replicas.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="ddns-accelerator-aws-access-key">AWS access key id</label></th>
+                        <td>
+                            <input
+                                class="regular-text"
+                                id="ddns-accelerator-aws-access-key"
+                                type="text"
+                                name="ddns_accelerator_vps_aws_access_key_id"
+                                value="<?php echo esc_attr(get_option('ddns_accelerator_vps_aws_access_key_id', '')); ?>"
+                                placeholder="AKIA..."
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="ddns-accelerator-aws-secret">AWS secret access key</label></th>
+                        <td>
+                            <input
+                                class="regular-text ddns-accelerator-secret"
+                                id="ddns-accelerator-aws-secret"
+                                type="password"
+                                name="ddns_accelerator_vps_aws_secret_access_key"
+                                value="<?php echo esc_attr(get_option('ddns_accelerator_vps_aws_secret_access_key', '')); ?>"
+                                placeholder="AWS secret"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="ddns-accelerator-aws-region">AWS region</label></th>
+                        <td>
+                            <input
+                                class="regular-text"
+                                id="ddns-accelerator-aws-region"
+                                type="text"
+                                name="ddns_accelerator_vps_aws_region"
+                                value="<?php echo esc_attr(get_option('ddns_accelerator_vps_aws_region', '')); ?>"
+                                placeholder="us-east-1"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="ddns-accelerator-do-token">DigitalOcean token</label></th>
+                        <td>
+                            <input
+                                class="regular-text ddns-accelerator-secret"
+                                id="ddns-accelerator-do-token"
+                                type="password"
+                                name="ddns_accelerator_vps_do_token"
+                                value="<?php echo esc_attr(get_option('ddns_accelerator_vps_do_token', '')); ?>"
+                                placeholder="DigitalOcean token"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="ddns-accelerator-hetzner-token">Hetzner token</label></th>
+                        <td>
+                            <input
+                                class="regular-text ddns-accelerator-secret"
+                                id="ddns-accelerator-hetzner-token"
+                                type="password"
+                                name="ddns_accelerator_vps_hetzner_token"
+                                value="<?php echo esc_attr(get_option('ddns_accelerator_vps_hetzner_token', '')); ?>"
+                                placeholder="Hetzner token"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="ddns-accelerator-vultr-token">Vultr token</label></th>
+                        <td>
+                            <input
+                                class="regular-text ddns-accelerator-secret"
+                                id="ddns-accelerator-vultr-token"
+                                type="password"
+                                name="ddns_accelerator_vps_vultr_token"
+                                value="<?php echo esc_attr(get_option('ddns_accelerator_vps_vultr_token', '')); ?>"
+                                placeholder="Vultr token"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="ddns-accelerator-vps-other">Other provider notes</label></th>
+                        <td>
+                            <textarea
+                                class="large-text"
+                                id="ddns-accelerator-vps-other"
+                                name="ddns_accelerator_vps_other"
+                                rows="3"
+                            ><?php echo esc_textarea(get_option('ddns_accelerator_vps_other', '')); ?></textarea>
                         </td>
                     </tr>
                 </table>

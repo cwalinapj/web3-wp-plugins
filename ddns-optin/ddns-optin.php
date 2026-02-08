@@ -61,6 +61,7 @@ function ddns_optin_shortcode(): string
 
     return '<form class="ddns-optin-form" data-ddns-optin="1">'
         . '<label class="ddns-optin-label">' . $heading . '</label>'
+        . '<p class="ddns-optin-wallet-note">Requires the Origin Wallet app to complete Web3 actions.</p>'
         . '<div class="ddns-optin-fields">'
         . '<input type="email" name="ddns_optin_email" class="ddns-optin-input" '
         . 'placeholder="' . $placeholder . '" required>'

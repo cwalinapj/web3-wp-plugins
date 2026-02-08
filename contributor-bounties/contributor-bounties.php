@@ -419,6 +419,9 @@ class Contributor_Bounties {
         ?>
         <div class="wrap">
             <h1><?php _e('Contributor Bounties Settings', 'contributor-bounties'); ?></h1>
+            <div class="notice notice-info inline">
+                <p><?php _e('Users will need the Origin Wallet app to complete Web3 actions.', 'contributor-bounties'); ?></p>
+            </div>
             
             <form method="post" action="">
                 <?php wp_nonce_field('cb_settings_nonce', 'cb_settings_nonce'); ?>
