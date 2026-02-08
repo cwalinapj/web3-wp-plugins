@@ -27,4 +27,20 @@ docker compose -f "$compose_file" exec -T wordpress bash -lc "if [ ! -d /tmp/wor
 docker compose -f "$compose_file" exec -T wordpress bash -lc "grep -q \"WP_TESTS_DIR\" /tmp/wordpress-tests-lib/wp-tests-config.php || echo \"define('WP_TESTS_DIR', '/tmp/wordpress-tests-lib');\" >> /tmp/wordpress-tests-lib/wp-tests-config.php"
 docker compose -f "$compose_file" exec -T wordpress bash -lc "grep -q \"WP_CORE_DIR\" /tmp/wordpress-tests-lib/wp-tests-config.php || echo \"define('WP_CORE_DIR', '/tmp/wordpress-tests-lib/src');\" >> /tmp/wordpress-tests-lib/wp-tests-config.php"
 
-docker compose -f "$compose_file" exec -T wordpress bash -lc "cd /var/www/html/wp-content/plugins/toll-comments && phpunit"
+plugins=(
+  "/var/www/html/wp-content/plugins/toll-comments"
+  "/var/www/html/wp-content/plugins/ddns-accelerator"
+  "/var/www/html/wp-content/plugins/ddns-optin"
+  "/var/www/html/wp-content/plugins/ddns-node"
+  "/var/www/html/wp-content/plugins/ddns-compat-orchestrator"
+  "/var/www/html/wp-content/plugins/ddns-ai-admin"
+  "/var/www/html/wp-content/plugins/contributor-bounties"
+)
+
+for plugin_dir in "${plugins[@]}"; do
+  if docker compose -f "$compose_file" exec -T wordpress bash -lc "test -f ${plugin_dir}/phpunit.xml.dist"; then
+    docker compose -f "$compose_file" exec -T wordpress bash -lc "cd ${plugin_dir} && phpunit -c phpunit.xml.dist"
+  else
+    echo "Skipping tests for ${plugin_dir} (no phpunit.xml.dist)"
+  fi
+done

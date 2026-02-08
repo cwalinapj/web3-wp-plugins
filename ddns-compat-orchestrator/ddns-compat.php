@@ -25,16 +25,3 @@ require_once DDNS_COMPAT_PATH . 'includes/jobs.php';
 require_once DDNS_COMPAT_PATH . 'includes/admin-ui.php';
 require_once DDNS_COMPAT_PATH . 'includes/wallet.php';
 require_once DDNS_COMPAT_PATH . 'includes/miner-proof.php';
-
-function ddns_compat_enqueue_admin_assets($hook): void {
-  if ($hook !== 'settings_page_ddns-compat') return;
-
-  wp_enqueue_style('ddns-compat-admin', DDNS_COMPAT_URL . 'includes/assets/admin.css', array(), DDNS_COMPAT_VERSION);
-  wp_enqueue_script('ddns-compat-admin', DDNS_COMPAT_URL . 'includes/assets/admin.js', array(), DDNS_COMPAT_VERSION, true);
-
-  wp_localize_script('ddns-compat-admin', 'DDNS_COMPAT_CFG', array(
-    'ajaxUrl' => admin_url('admin-ajax.php'),
-    'nonce'   => wp_create_nonce('ddns_compat_nonce'),
-  ));
-}
-add_action('admin_enqueue_scripts', 'ddns_compat_enqueue_admin_assets');

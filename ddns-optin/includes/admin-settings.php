@@ -40,6 +40,13 @@ function ddns_optin_register_settings(): void
     register_setting(
         'ddns_optin',
         'ddns_optin_endpoint',
+        array(
+            'type' => 'string',
+            'sanitize_callback' => 'esc_url_raw',
+            'default' => '',
+        )
+    );
+
     // ----- Worker destination (admin controlled) -----
     register_setting(
         'ddns_optin',
@@ -106,6 +113,14 @@ function ddns_optin_register_settings(): void
         'ddns_optin_endpoint',
         'Worker Endpoint URL',
         'ddns_optin_render_endpoint_field',
+        'ddns-optin',
+        'ddns_optin_main'
+    );
+
+    add_settings_field(
+        'ddns_optin_worker_endpoint',
+        'Public Worker Endpoint',
+        'ddns_optin_render_worker_endpoint_field',
         'ddns-optin',
         'ddns_optin_main'
     );
@@ -200,6 +215,8 @@ function ddns_optin_render_endpoint_field(): void
         esc_attr($value),
         esc_attr('https://example.com/v1/optin/submit')
     );
+}
+
 function ddns_optin_render_worker_endpoint_field(): void
 {
     $value = esc_attr(get_option('ddns_optin_worker_endpoint', ''));
@@ -214,8 +231,6 @@ function ddns_optin_render_site_id_field(): void
         '<input class="regular-text" type="text" name="ddns_optin_site_id" value="%s">',
         esc_attr($value)
     );
-    $value = esc_attr(get_option('ddns_optin_site_id', ''));
-    echo '<input class="regular-text" type="text" name="ddns_optin_site_id" value="' . $value . '" placeholder="site_123">';
     echo '<p class="description">Identifier assigned on your DDNS server. Used to map submissions to the correct site.</p>';
 }
 

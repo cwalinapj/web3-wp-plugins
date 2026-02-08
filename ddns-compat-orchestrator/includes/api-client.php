@@ -64,7 +64,7 @@ function ddns_compat_request(string $method, string $path, array $body = null): 
         'status' => $status,
         'data' => is_array($data) ? $data : array('raw' => $raw),
     );
-if (!defined('ABSPATH')) exit;
+}
 
 function ddns_compat_http_post_json($url, $headers, $body) {
   $args = array(
