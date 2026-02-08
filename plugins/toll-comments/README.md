@@ -7,6 +7,7 @@ Refundable, credit-based comment tolls to reduce spam.
 - On approval: credits are refunded (optionally with a bonus).
 - On spam/trash: credits are forfeited.
 - Wallet is identified via **challenge + signature** (no private keys).
+- Optional Node Mode caches verified `/resolve` responses and credits the Site Reward Pool.
 
 ## Requirements
 - Credits coordinator running (default: `http://localhost:8054`).
@@ -26,6 +27,7 @@ Settings → **DDNS Toll Comments**:
 - **Bonus**: optional; default multiplier 2x.
 - **Exempt roles/users**: skip tolls for trusted users.
 - **High-rep wallets**: optional allowlist for free comments.
+- **Node Mode**: opt-in cache + verify with resource caps.
 
 ## Comment flow
 1. User connects wallet and signs a login challenge.

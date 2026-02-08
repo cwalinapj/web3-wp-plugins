@@ -47,6 +47,10 @@ Stop:
 /Users/root1/dev/web3-repos/web3-wp-plugins/scripts/package.sh
 ```
 
+## Docs
+- docs/WP_NODE_MODE.md
+- docs/TOLL_COMMENTS_REWARDS.md
+
 ## Plugins
 - ddns-optin
 - ddns-accelerator
