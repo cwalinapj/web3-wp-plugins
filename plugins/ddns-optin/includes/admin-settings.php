@@ -47,6 +47,26 @@ function ddns_optin_register_settings(): void
         )
     );
 
+    register_setting(
+        'ddns_optin',
+        'ddns_optin_coordinator_url',
+        array(
+            'type' => 'string',
+            'sanitize_callback' => 'esc_url_raw',
+            'default' => '',
+        )
+    );
+
+    register_setting(
+        'ddns_optin',
+        'ddns_optin_site_token',
+        array(
+            'type' => 'string',
+            'sanitize_callback' => 'sanitize_text_field',
+            'default' => '',
+        )
+    );
+
     // ----- Worker destination (admin controlled) -----
     register_setting(
         'ddns_optin',
@@ -113,6 +133,22 @@ function ddns_optin_register_settings(): void
         'ddns_optin_endpoint',
         'Worker Endpoint URL',
         'ddns_optin_render_endpoint_field',
+        'ddns-optin',
+        'ddns_optin_main'
+    );
+
+    add_settings_field(
+        'ddns_optin_coordinator_url',
+        'Coordinator URL',
+        'ddns_optin_render_coordinator_field',
+        'ddns-optin',
+        'ddns_optin_main'
+    );
+
+    add_settings_field(
+        'ddns_optin_site_token',
+        'Site token',
+        'ddns_optin_render_site_token_field',
         'ddns-optin',
         'ddns_optin_main'
     );
@@ -345,6 +381,18 @@ function ddns_optin_render_endpoint_field(): void
     );
 }
 
+function ddns_optin_render_coordinator_field(): void
+{
+    $value = esc_attr(get_option('ddns_optin_coordinator_url', ''));
+    echo '<input class="regular-text" type="url" name="ddns_optin_coordinator_url" value="' . $value . '" placeholder="https://control.example.com">';
+}
+
+function ddns_optin_render_site_token_field(): void
+{
+    $value = esc_attr(get_option('ddns_optin_site_token', ''));
+    echo '<input class="regular-text" type="password" name="ddns_optin_site_token" value="' . $value . '" autocomplete="off">';
+}
+
 function ddns_optin_render_worker_endpoint_field(): void
 {
     $value = esc_attr(get_option('ddns_optin_worker_endpoint', ''));
@@ -401,6 +449,13 @@ function ddns_optin_render_settings_page(): void
             <?php do_settings_sections('ddns-optin'); ?>
             <?php submit_button(); ?>
         </form>
+        <hr />
+        <h2>Connection test</h2>
+        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+            <input type="hidden" name="action" value="ddns_optin_test_connection" />
+            <?php wp_nonce_field('ddns_optin_test_connection'); ?>
+            <?php submit_button('Test connection', 'secondary', 'submit', false); ?>
+        </form>
 
         <hr />
         <h2>Shortcode</h2>
@@ -409,6 +464,34 @@ function ddns_optin_render_settings_page(): void
     </div>
     <?php
 }
+
+function ddns_optin_handle_connection_test(): void
+{
+    if (!current_user_can('manage_options')) {
+        wp_die('Unauthorized', 403);
+    }
+    check_admin_referer('ddns_optin_test_connection');
+
+    $base = (string) get_option('ddns_optin_coordinator_url', '');
+    if (!$base) {
+        add_settings_error('ddns_optin', 'ddns_optin_missing_url', 'Coordinator URL not configured.');
+        wp_safe_redirect(admin_url('options-general.php?page=ddns-optin'));
+        exit;
+    }
+
+    $token = (string) get_option('ddns_optin_site_token', '');
+    $resp = ddns_sdk_health($base, $token);
+    if (!$resp['ok']) {
+        $msg = $resp['error'] ?? ('Connection failed (HTTP ' . ($resp['status'] ?? 'unknown') . ')');
+        add_settings_error('ddns_optin', 'ddns_optin_test_failed', $msg);
+        wp_safe_redirect(admin_url('options-general.php?page=ddns-optin'));
+        exit;
+    }
+    add_settings_error('ddns_optin', 'ddns_optin_test_ok', 'Connection successful.', 'updated');
+    wp_safe_redirect(admin_url('options-general.php?page=ddns-optin'));
+    exit;
+}
+add_action('admin_post_ddns_optin_test_connection', 'ddns_optin_handle_connection_test');
 
 function ddns_optin_render_cf_api_token_field(): void
 {

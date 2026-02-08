@@ -16,6 +16,7 @@ define('DDNS_OPTIN_PATH', plugin_dir_path(__FILE__));
 define('DDNS_OPTIN_URL', plugin_dir_url(__FILE__));
 
 require_once DDNS_OPTIN_PATH . 'includes/admin-settings.php';
+require_once dirname(DDNS_OPTIN_PATH, 2) . '/shared/ddns-sdk-php/ddns-sdk.php';
 
 function ddns_optin_enqueue_assets(): void
 {

@@ -17,6 +17,8 @@ define('DDNS_TOLL_COMMENTS_PATH', plugin_dir_path(__FILE__));
 
 define('DDNS_TOLL_COMMENTS_URL', plugin_dir_url(__FILE__));
 
+require_once dirname(DDNS_TOLL_COMMENTS_PATH, 2) . '/shared/ddns-sdk-php/ddns-sdk.php';
+
 define('DDNS_TOLL_COMMENTS_HOLD_TTL', 15 * MINUTE_IN_SECONDS);
 
 define('DDNS_TOLL_COMMENTS_DEFAULT_COORDINATOR', 'http://localhost:8054');
@@ -730,22 +732,17 @@ function ddns_toll_comments_get_pool_balance(): ?string
     if ($site_token === '') {
         return null;
     }
-    $response = wp_remote_get(ddns_toll_comments_coordinator_url() . '/site-pool?site_id=' . rawurlencode($site_id), array(
-        'timeout' => 10,
-        'headers' => array('x-ddns-site-token' => $site_token),
-    ));
-    if (is_wp_error($response)) {
+    $resp = ddns_sdk_request(
+        ddns_toll_comments_coordinator_url(),
+        '/site-pool?site_id=' . rawurlencode($site_id),
+        'GET',
+        null,
+        array('x-ddns-site-token' => $site_token)
+    );
+    if (!$resp['ok'] || !is_array($resp['data'])) {
         return null;
     }
-    $status = wp_remote_retrieve_response_code($response);
-    if ($status < 200 || $status >= 300) {
-        return null;
-    }
-    $body = json_decode(wp_remote_retrieve_body($response), true);
-    if (!is_array($body)) {
-        return null;
-    }
-    return isset($body['balance']) ? (string) $body['balance'] : null;
+    return isset($resp['data']['balance']) ? (string) $resp['data']['balance'] : null;
 }
 
 function ddns_toll_comments_get_pool_receipts(): array
@@ -758,22 +755,17 @@ function ddns_toll_comments_get_pool_receipts(): array
     if ($site_token === '') {
         return array();
     }
-    $response = wp_remote_get(ddns_toll_comments_coordinator_url() . '/site-pool/receipts?site_id=' . rawurlencode($site_id), array(
-        'timeout' => 10,
-        'headers' => array('x-ddns-site-token' => $site_token),
-    ));
-    if (is_wp_error($response)) {
+    $resp = ddns_sdk_request(
+        ddns_toll_comments_coordinator_url(),
+        '/site-pool/receipts?site_id=' . rawurlencode($site_id),
+        'GET',
+        null,
+        array('x-ddns-site-token' => $site_token)
+    );
+    if (!$resp['ok'] || !is_array($resp['data'])) {
         return array();
     }
-    $status = wp_remote_retrieve_response_code($response);
-    if ($status < 200 || $status >= 300) {
-        return array();
-    }
-    $body = json_decode(wp_remote_retrieve_body($response), true);
-    if (!is_array($body)) {
-        return array();
-    }
-    return isset($body['receipts']) && is_array($body['receipts']) ? $body['receipts'] : array();
+    return isset($resp['data']['receipts']) && is_array($resp['data']['receipts']) ? $resp['data']['receipts'] : array();
 }
 
 function ddns_toll_comments_call_coordinator(string $path, array $payload): array
@@ -786,28 +778,15 @@ function ddns_toll_comments_call_coordinator(string $path, array $payload): arra
     }
 
     $site_token = (string) get_option('ddns_toll_comments_site_token', '');
-    $headers = array('Content-Type' => 'application/json');
+    $headers = array();
     if ($site_token !== '') {
         $headers['x-ddns-site-token'] = $site_token;
     }
-
-    $response = wp_remote_post(ddns_toll_comments_coordinator_url() . $path, array(
-        'timeout' => 15,
-        'headers' => $headers,
-        'body' => wp_json_encode($payload),
-    ));
-
-    if (is_wp_error($response)) {
-        return array('ok' => false, 'error' => $response->get_error_message());
+    $resp = ddns_sdk_request(ddns_toll_comments_coordinator_url(), $path, 'POST', $payload, $headers);
+    if (!$resp['ok']) {
+        return array('ok' => false, 'error' => $resp['data']['error'] ?? $resp['error'] ?? 'coordinator_error');
     }
-
-    $status = wp_remote_retrieve_response_code($response);
-    $body = json_decode(wp_remote_retrieve_body($response), true);
-    if ($status < 200 || $status >= 300) {
-        return array('ok' => false, 'error' => $body['error'] ?? 'coordinator_error');
-    }
-
-    return array('ok' => true, 'data' => $body);
+    return array('ok' => true, 'data' => $resp['data']);
 }
 
 function ddns_toll_comments_rest_challenge(WP_REST_Request $request)
