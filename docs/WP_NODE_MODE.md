@@ -25,6 +25,15 @@ Settings → **DDNS Toll Comments** → **Node mode**:
 - `COMMENTS_SITE_TOKEN` configured on the coordinator and in WP settings.
 - Node receipts are accepted only with valid `verification_id` from `/node/verify`.
 
+## Local test harness (Docker)
+```bash
+docker compose -f docker-compose.node-mode.yml up --build
+```
+
+Then in WP settings:
+- Coordinator URL: `http://mock-coordinator:8054`
+- Site token: `dev-token`
+
 ## Safety
 - Only verified responses are cached and served.
 - No open proxy behavior.

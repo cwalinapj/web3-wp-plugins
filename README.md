@@ -42,6 +42,11 @@ Stop:
 /Users/root1/dev/web3-repos/web3-wp-plugins/scripts/wp-down.sh
 ```
 
+## Node Mode Harness
+```bash
+docker compose -f /Users/root1/dev/web3-repos/web3-wp-plugins/docker-compose.node-mode.yml up --build
+```
+
 ## Package Plugins
 ```bash
 /Users/root1/dev/web3-repos/web3-wp-plugins/scripts/package.sh

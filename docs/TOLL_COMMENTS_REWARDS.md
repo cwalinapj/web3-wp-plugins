@@ -24,4 +24,5 @@ Anti-abuse rules:
 - `POST /comments/submit`
 - `POST /comments/finalize`
 - `GET /site-pool?site_id=<id>`
+- `GET /site-pool/receipts?site_id=<id>`
 - `GET /public/ledger`

@@ -512,6 +512,7 @@ function ddns_toll_comments_render_settings_page(): void
         return;
     }
     $pool_balance = ddns_toll_comments_get_pool_balance();
+    $pool_receipts = ddns_toll_comments_get_pool_receipts();
     ?>
     <div class="wrap">
         <h1>DDNS Toll Comments</h1>
@@ -522,6 +523,27 @@ function ddns_toll_comments_render_settings_page(): void
         </form>
         <?php if ($pool_balance !== null) : ?>
             <p><strong>Site Reward Pool:</strong> <?php echo esc_html($pool_balance); ?> credits</p>
+        <?php endif; ?>
+        <?php if (!empty($pool_receipts)) : ?>
+            <h2>Recent Pool Activity</h2>
+            <table class="widefat striped">
+                <thead>
+                    <tr>
+                        <th>Time (UTC)</th>
+                        <th>Type</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach (array_slice($pool_receipts, 0, 10) as $entry) : ?>
+                        <tr>
+                            <td><?php echo esc_html(gmdate('Y-m-d H:i:s', (int) ($entry['ts'] ?? time()))); ?></td>
+                            <td><?php echo esc_html($entry['type'] ?? ''); ?></td>
+                            <td><code><?php echo esc_html(wp_json_encode($entry['payload'] ?? array())); ?></code></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         <?php endif; ?>
         <p class="description">Mock mode: define <code>DDNS_TOLL_COMMENTS_MOCK_MODE</code> in wp-config.php for local testing.</p>
     </div>
@@ -696,6 +718,34 @@ function ddns_toll_comments_get_pool_balance(): ?string
         return null;
     }
     return isset($body['balance']) ? (string) $body['balance'] : null;
+}
+
+function ddns_toll_comments_get_pool_receipts(): array
+{
+    $site_id = (string) get_option('ddns_toll_comments_site_id', '');
+    if ($site_id === '') {
+        return array();
+    }
+    $site_token = (string) get_option('ddns_toll_comments_site_token', '');
+    if ($site_token === '') {
+        return array();
+    }
+    $response = wp_remote_get(ddns_toll_comments_coordinator_url() . '/site-pool/receipts?site_id=' . rawurlencode($site_id), array(
+        'timeout' => 10,
+        'headers' => array('x-ddns-site-token' => $site_token),
+    ));
+    if (is_wp_error($response)) {
+        return array();
+    }
+    $status = wp_remote_retrieve_response_code($response);
+    if ($status < 200 || $status >= 300) {
+        return array();
+    }
+    $body = json_decode(wp_remote_retrieve_body($response), true);
+    if (!is_array($body)) {
+        return array();
+    }
+    return isset($body['receipts']) && is_array($body['receipts']) ? $body['receipts'] : array();
 }
 
 function ddns_toll_comments_call_coordinator(string $path, array $payload): array
@@ -950,6 +1000,8 @@ function ddns_toll_comments_node_verify(array $payload): array
     $site_id = (string) get_option('ddns_toll_comments_site_id', 'site-1');
     $response = ddns_toll_comments_call_coordinator('/node/verify', array(
         'site_id' => $site_id,
+        'authority_sig' => $payload['metadata']['authoritySig'] ?? '',
+        'result_hash' => $payload['metadata']['resultHash'] ?? '',
         'entry' => array(
             'name' => $payload['name'] ?? '',
             'records' => $payload['records'] ?? array(),
