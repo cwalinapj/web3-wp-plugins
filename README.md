@@ -51,5 +51,5 @@ Stop:
 - ddns-optin
 - ddns-accelerator
 - ddns-compat-orchestrator
-- ddns-toll-comments
+- plugins/toll-comments
 - ddns-ai-admin

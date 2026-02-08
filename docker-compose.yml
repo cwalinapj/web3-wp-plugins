@@ -26,7 +26,7 @@ services:
       - ./ddns-optin:/var/www/html/wp-content/plugins/ddns-optin
       - ./ddns-accelerator:/var/www/html/wp-content/plugins/ddns-accelerator
       - ./ddns-compat-orchestrator:/var/www/html/wp-content/plugins/ddns-compat-orchestrator
-      - ./ddns-toll-comments:/var/www/html/wp-content/plugins/ddns-toll-comments
+      - ./plugins/toll-comments:/var/www/html/wp-content/plugins/toll-comments
       - ./ddns-ai-admin:/var/www/html/wp-content/plugins/ddns-ai-admin
 volumes:
   db_data:
