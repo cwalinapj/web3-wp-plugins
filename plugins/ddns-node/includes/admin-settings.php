@@ -223,9 +223,48 @@ function ddns_node_render_settings_page(): void
     echo '</form>';
 
     echo '<hr /><h2>Connection test</h2>';
-    echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
-    echo '<input type="hidden" name="action" value="ddns_node_test_connection" />';
-    wp_nonce_field('ddns_node_test_connection');
-    submit_button('Test connection', 'secondary', 'submit', false);
-    echo '</form></div>';
+    echo '<button class="button" id="ddns-node-test-upstream">Test upstream</button>';
+    echo '<span id="ddns-node-test-result" style="margin-left:10px;"></span>';
+    echo '</div>';
+    ?>
+    <script>
+      (function() {
+        const btn = document.getElementById('ddns-node-test-upstream');
+        const out = document.getElementById('ddns-node-test-result');
+        if (!btn) return;
+        btn.addEventListener('click', function(ev) {
+          ev.preventDefault();
+          out.textContent = 'Testing...';
+          const data = new FormData();
+          data.append('action', 'ddns_node_test_upstream');
+          data.append('_ajax_nonce', '<?php echo esc_js(wp_create_nonce('ddns_node_test_upstream')); ?>');
+          fetch(ajaxurl, { method: 'POST', body: data })
+            .then(r => r.json())
+            .then(r => { out.textContent = r.ok ? 'OK' : ('Failed: ' + (r.error || 'unknown')); })
+            .catch(() => { out.textContent = 'Failed: network error'; });
+        });
+      })();
+    </script>
+    <?php
 }
+
+function ddns_node_handle_upstream_test_ajax(): void
+{
+    check_ajax_referer('ddns_node_test_upstream');
+    $url = rtrim((string) get_option('ddns_node_worker_url', ''), '/');
+    if (!$url) {
+        wp_send_json(array('ok' => false, 'error' => 'missing_worker_url'));
+    }
+    $headers = array();
+    $token = (string) get_option('ddns_node_site_token', '');
+    if ($token) {
+        $headers['x-ddns-site-token'] = $token;
+    }
+    $resp = wp_remote_get($url . '/healthz', array('timeout' => 5, 'headers' => $headers));
+    if (is_wp_error($resp)) {
+        wp_send_json(array('ok' => false, 'error' => $resp->get_error_message()));
+    }
+    $code = wp_remote_retrieve_response_code($resp);
+    wp_send_json(array('ok' => $code === 200, 'status' => $code));
+}
+add_action('wp_ajax_ddns_node_test_upstream', 'ddns_node_handle_upstream_test_ajax');
