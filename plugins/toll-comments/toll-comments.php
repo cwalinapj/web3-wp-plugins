@@ -155,6 +155,12 @@ function ddns_toll_comments_register_settings(): void
         'default' => 'example.com',
     ));
 
+    register_setting('ddns_toll_comments', 'ddns_toll_comments_node_name', array(
+        'type' => 'string',
+        'sanitize_callback' => 'sanitize_text_field',
+        'default' => '',
+    ));
+
     register_setting('ddns_toll_comments', 'ddns_toll_comments_node_max_disk_mb', array(
         'type' => 'integer',
         'sanitize_callback' => 'absint',
@@ -336,6 +342,14 @@ function ddns_toll_comments_register_settings(): void
     );
 
     add_settings_field(
+        'ddns_toll_comments_node_name',
+        'Node name',
+        'ddns_toll_comments_render_node_name',
+        'ddns-toll-comments',
+        'ddns_toll_comments_node'
+    );
+
+    add_settings_field(
         'ddns_toll_comments_node_max_disk_mb',
         'Max disk (MB)',
         'ddns_toll_comments_render_node_max_disk',
@@ -480,6 +494,20 @@ function ddns_toll_comments_render_node_hot_names(): void
 {
     $value = esc_attr(get_option('ddns_toll_comments_node_hot_names', 'example.com'));
     echo '<input class="regular-text" type="text" name="ddns_toll_comments_node_hot_names" value="' . $value . '" placeholder="example.com,alice.dns">';
+}
+
+function ddns_toll_comments_render_node_name(): void
+{
+    $value = esc_attr(get_option('ddns_toll_comments_node_name', ''));
+    if ($value === '') {
+        $site_id = (string) get_option('ddns_toll_comments_site_id', 'site-1');
+        $value = 'node-' . $site_id . '.dns';
+    }
+    $pubkey = ddns_toll_comments_get_node_pubkey();
+    echo '<input class="regular-text" type="text" name="ddns_toll_comments_node_name" value="' . $value . '" placeholder="node-<id>.dns">';
+    if ($pubkey !== '') {
+        echo '<p class="description">Node pubkey: <code>ed25519:' . esc_html($pubkey) . '</code></p>';
+    }
 }
 
 function ddns_toll_comments_render_node_max_disk(): void
@@ -930,6 +958,32 @@ function ddns_toll_comments_transition_comment_status(string $new_status, string
 }
 add_action('transition_comment_status', 'ddns_toll_comments_transition_comment_status', 10, 3);
 
+function ddns_toll_comments_get_node_keypair(): array
+{
+    $stored = get_option('ddns_toll_comments_node_keypair', array());
+    if (is_array($stored) && !empty($stored['public']) && !empty($stored['secret'])) {
+        return $stored;
+    }
+    if (!function_exists('sodium_crypto_sign_keypair')) {
+        return array();
+    }
+    $pair = sodium_crypto_sign_keypair();
+    $public = sodium_crypto_sign_publickey($pair);
+    $secret = sodium_crypto_sign_secretkey($pair);
+    $stored = array(
+        'public' => base64_encode($public),
+        'secret' => base64_encode($secret),
+    );
+    update_option('ddns_toll_comments_node_keypair', $stored, false);
+    return $stored;
+}
+
+function ddns_toll_comments_get_node_pubkey(): string
+{
+    $pair = ddns_toll_comments_get_node_keypair();
+    return isset($pair['public']) ? (string) $pair['public'] : '';
+}
+
 function ddns_toll_comments_node_mode_enabled(): bool
 {
     return (bool) get_option('ddns_toll_comments_node_mode', false);
@@ -1064,12 +1118,37 @@ function ddns_toll_comments_node_bandwidth_allow(int $bytes): bool
     return true;
 }
 
+function ddns_toll_comments_stable_json($value): string
+{
+    if (is_array($value)) {
+        if (array_keys($value) === range(0, count($value) - 1)) {
+            $items = array_map('ddns_toll_comments_stable_json', $value);
+            return '[' . implode(',', $items) . ']';
+        }
+        ksort($value);
+        $parts = array();
+        foreach ($value as $key => $val) {
+            $parts[] = json_encode((string) $key) . ':' . ddns_toll_comments_stable_json($val);
+        }
+        return '{' . implode(',', $parts) . '}';
+    }
+    return json_encode($value);
+}
+
 function ddns_toll_comments_node_submit_receipt(string $type, string $name, array $payload, string $verification_id = ''): void
 {
     $site_id = (string) get_option('ddns_toll_comments_site_id', 'site-1');
     $site_token = (string) get_option('ddns_toll_comments_site_token', '');
     if ($site_token === '') {
         return;
+    }
+    $pair = ddns_toll_comments_get_node_keypair();
+    if (empty($pair['public']) || empty($pair['secret'])) {
+        return;
+    }
+    $node_name = (string) get_option('ddns_toll_comments_node_name', '');
+    if ($node_name === '') {
+        $node_name = 'node-' . $site_id . '.dns';
     }
     $receipt = array(
         'type' => $type,
@@ -1079,11 +1158,18 @@ function ddns_toll_comments_node_submit_receipt(string $type, string $name, arra
         'result_hash' => hash('sha256', wp_json_encode($payload)),
         'bytes' => strlen(wp_json_encode($payload)),
         'verification_id' => $verification_id,
+        'node_name' => $node_name,
+        'node_pubkey' => 'ed25519:' . $pair['public'],
     );
-    $signature = hash_hmac('sha256', wp_json_encode($receipt), $site_token);
+    if (!function_exists('sodium_crypto_sign_detached')) {
+        return;
+    }
+    $message = 'node_receipt\n' . ddns_toll_comments_stable_json($receipt);
+    $signature = sodium_crypto_sign_detached($message, base64_decode($pair['secret']));
+    $signature_b64 = base64_encode($signature);
     ddns_toll_comments_call_coordinator('/node/receipts', array(
         'receipt' => $receipt,
-        'signature' => $signature,
+        'signature' => $signature_b64,
         'site_id' => $site_id,
     ));
 }
