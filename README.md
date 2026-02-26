@@ -3,19 +3,19 @@
 This repo hosts WordPress plugins for the Origin/DDNS ecosystem.
 
 ## Structure
-- `plugins/` all plugins (WordPress-ready)
+- `wp-content/plugins/` all WordPress plugins
 - `shared/` shared PHP SDKs and UI helpers
 
 ## Plugins (purpose + status)
-- `plugins/ddns-optin` — Opt-in form + shortcode + health check. **Status: MVP**
-- `plugins/toll-comments` — Refundable toll for comments. **Status: MVP**
-- `plugins/tolldns` — TollDNS activation/status plugin used by AI WebAdmin guardrails. **Status: MVP**
-- `plugins/ai-webadmin` — AI WebAdmin WordPress plugin (worker moderation, hardening, backup/sandbox controls). **Status: Active Split**
-- `plugins/ddns-node` — Cache helper node. **Status: Next**
-- `plugins/ddns-accelerator` — Admin wizard for caching worker + asset export. **Status: Next**
-- `plugins/ddns-compat-orchestrator` — Compatibility checks. **Status: Later**
-- `plugins/ddns-ai-admin` — Stub. **Status: Later**
-- `plugins/contributor-bounties` — Content bounties. **Status: Later**
+- `wp-content/plugins/ddns-optin` — Opt-in form + shortcode + health check. **Status: MVP**
+- `wp-content/plugins/toll-comments` — Refundable toll for comments. **Status: MVP**
+- `wp-content/plugins/tolldns` — TollDNS activation/status plugin used by AI WebAdmin guardrails. **Status: MVP**
+- `wp-content/plugins/ai-webadmin` — AI WebAdmin WordPress plugin (worker moderation, hardening, backup/sandbox controls). **Status: Active Split**
+- `wp-content/plugins/ddns-node` — Cache helper node. **Status: Next**
+- `wp-content/plugins/ddns-accelerator` — Admin wizard for caching worker + asset export. **Status: Next**
+- `wp-content/plugins/ddns-compat-orchestrator` — Compatibility checks. **Status: Later**
+- `wp-content/plugins/ddns-ai-admin` — Stub. **Status: Later**
+- `wp-content/plugins/contributor-bounties` — Content bounties. **Status: Later**
 
 ## Shared
 - `shared/ddns-sdk-php` — coordinator/client HTTP helper for MVP plugins.
