@@ -9,6 +9,8 @@ This repo hosts WordPress plugins for the Origin/DDNS ecosystem.
 ## Plugins (purpose + status)
 - `plugins/ddns-optin` — Opt-in form + shortcode + health check. **Status: MVP**
 - `plugins/toll-comments` — Refundable toll for comments. **Status: MVP**
+- `plugins/tolldns` — TollDNS activation/status plugin used by AI WebAdmin guardrails. **Status: MVP**
+- `plugins/ai-webadmin` — AI WebAdmin WordPress plugin (worker moderation, hardening, backup/sandbox controls). **Status: Active Split**
 - `plugins/ddns-node` — Cache helper node. **Status: Next**
 - `plugins/ddns-accelerator` — Admin wizard for caching worker + asset export. **Status: Next**
 - `plugins/ddns-compat-orchestrator` — Compatibility checks. **Status: Later**
