@@ -1,4 +1,4 @@
-plugins/
+wp-content/plugins/
   wp-contributor-bounties/
   wp-fix-market/
 

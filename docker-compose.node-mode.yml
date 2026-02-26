@@ -24,7 +24,7 @@ services:
     ports:
       - "8085:80"
     volumes:
-      - ./plugins/toll-comments:/var/www/html/wp-content/plugins/toll-comments
+      - ./wp-content/plugins/toll-comments:/var/www/html/wp-content/plugins/toll-comments
   mock-coordinator:
     build:
       context: ./services/mock-coordinator

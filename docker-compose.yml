@@ -23,12 +23,12 @@ services:
     ports:
       - "8085:80"
     volumes:
-      - ./plugins/ddns-optin:/var/www/html/wp-content/plugins/ddns-optin
-      - ./plugins/ddns-accelerator:/var/www/html/wp-content/plugins/ddns-accelerator
-      - ./plugins/ddns-compat-orchestrator:/var/www/html/wp-content/plugins/ddns-compat-orchestrator
-      - ./plugins/ddns-node:/var/www/html/wp-content/plugins/ddns-node
-      - ./plugins/toll-comments:/var/www/html/wp-content/plugins/toll-comments
-      - ./plugins/ddns-ai-admin:/var/www/html/wp-content/plugins/ddns-ai-admin
-      - ./plugins/contributor-bounties:/var/www/html/wp-content/plugins/contributor-bounties
+      - ./wp-content/plugins/ddns-optin:/var/www/html/wp-content/plugins/ddns-optin
+      - ./wp-content/plugins/ddns-accelerator:/var/www/html/wp-content/plugins/ddns-accelerator
+      - ./wp-content/plugins/ddns-compat-orchestrator:/var/www/html/wp-content/plugins/ddns-compat-orchestrator
+      - ./wp-content/plugins/ddns-node:/var/www/html/wp-content/plugins/ddns-node
+      - ./wp-content/plugins/toll-comments:/var/www/html/wp-content/plugins/toll-comments
+      - ./wp-content/plugins/ddns-ai-admin:/var/www/html/wp-content/plugins/ddns-ai-admin
+      - ./wp-content/plugins/contributor-bounties:/var/www/html/wp-content/plugins/contributor-bounties
 volumes:
   db_data:

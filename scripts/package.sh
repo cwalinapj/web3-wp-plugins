@@ -15,9 +15,7 @@ root = Path('/Users/root1/dev/web3-repos/web3-wp-plugins')
 exclude = {'.git', 'node_modules', 'dist', '__pycache__'}
 
 plugin_dirs = []
-for plugin in [p for p in root.iterdir() if p.is_dir() and p.name not in ['docs','services','specs','contributor-bounties','scripts','dist','plugins']]:
-    plugin_dirs.append(plugin)
-plugins_root = root / 'plugins'
+plugins_root = root / 'wp-content' / 'plugins'
 if plugins_root.exists():
     for plugin in plugins_root.iterdir():
         if plugin.is_dir():
